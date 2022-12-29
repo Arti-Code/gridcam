@@ -3,9 +3,10 @@ import asyncio
 import json
 import logging
 import os
+#from os import PathLike
 import platform
 import ssl
-
+from pathlib import Path
 from aiohttp import web
 
 from aiortc import RTCPeerConnection, RTCSessionDescription
@@ -13,6 +14,8 @@ from aiortc.contrib.media import MediaPlayer, MediaRelay
 from aiortc.rtcrtpsender import RTCRtpSender
 
 ROOT = os.path.dirname(__file__)
+ROOT_PATH = Path(__file__)
+PROJECT_PATH = Path(__file__).parent
 
 
 relay = None
@@ -158,8 +161,12 @@ if __name__ == "__main__":
         ssl_context = None
 
     app = web.Application()
+    print(f"ROOT: {ROOT}")
+    print(f"PROJECT_PATH: {PROJECT_PATH}")
+    print(f"ROOT_PATH: {ROOT_PATH}")
     app.on_shutdown.append(on_shutdown)
     app.router.add_get("/", index)
     app.router.add_get("/client.js", javascript)
     app.router.add_post("/offer", offer)
+    app.add_routes([web.static('/static', path=ROOT)])
     web.run_app(app, host=args.host, port=args.port, ssl_context=ssl_context)
